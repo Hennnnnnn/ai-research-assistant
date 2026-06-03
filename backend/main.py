@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.users import router as users_router
+from app.api.research import router as research_router
 
 app = FastAPI(
     title="AI Research Assistant",
@@ -27,3 +28,4 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(research_router)
