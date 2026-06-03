@@ -1,12 +1,9 @@
 from fastapi import FastAPI
+from app.api.auth import router as auth_router
 
 app = FastAPI(
     title="AI Research Assistant",
     version="1.0.0"
 )
 
-@app.get("/")
-def root():
-    return {
-        "message": "AI Research Assistant API"
-    }
+app.include_router(auth_router)
