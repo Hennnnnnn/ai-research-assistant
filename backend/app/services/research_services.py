@@ -51,3 +51,26 @@ def create_research(db: Session, user: User, request: CreateResearchRequest):
     db.refresh(research)
     
     return research
+
+def delete_research(db: Session, user: User, research_id: int):
+    statement = select(
+        ResearchSession
+    ).where(
+        ResearchSession.id == research_id,
+        ResearchSession.user_id == user.id
+    )
+    
+    research = db.scalar(statement)
+    
+    if research is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Research not found"
+        )
+        
+    db.delete(research)
+    db.commit()
+    
+    return {
+        "message": "Research deleted"
+    }
