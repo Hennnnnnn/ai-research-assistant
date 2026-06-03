@@ -13,3 +13,12 @@ class ResearchResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+class ResearchListResponse(BaseModel):
+    id: int
+    topic: str
+    created_at: datetime
+    
+    model_config = {
+        "from_attributes": True
+    }
