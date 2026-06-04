@@ -1,41 +1,45 @@
-import os
+import json
 import logging
+
 from openai import OpenAI
+
 from app.core.config import OPENAI_API_KEY
 
-
 logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
-
 
 client = OpenAI(
     api_key=OPENAI_API_KEY
 )
 
+
 def generate_research_summary(
     topic: str
-) -> str:
+) -> dict:
     prompt = f"""
-        Create a concise research report about:
+        Create a research report about:
+
         {topic}
-        
-        Include:
-        1. Overview
-        2. Key Findings
-        3. Risks
-        4. Future Trends
-        
-        Format the response is markdown.
+
+        Return ONLY valid JSON.
+
+        Do not wrap the JSON inside markdown code blocks.
+        Do not include explanations.
+        Do not include any text outside JSON.
+
+        Schema:
+
+        {{
+            "overview": "",
+            "key_findings": [],
+            "risks": [],
+            "future_trends": []
+        }}
     """
-    
+
     if not OPENAI_API_KEY:
-        logger.warning("OPENAI_API_KEY is not configured; cannot generate research summary.")
-        return "Unable to generate research summary."
+        raise ValueError(
+            "OPENAI_API_KEY is not configured."
+        )
 
     try:
         response = client.chat.completions.create(
@@ -43,23 +47,49 @@ def generate_research_summary(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a professional research analyst."
+                    "content": (
+                        "You are a professional research analyst."
+                    )
                 },
                 {
                     "role": "user",
                     "content": prompt
                 }
-            ]
+            ],
+            temperature=0.7
         )
 
-        try:
-            return response.choices[0].message.content
-        except Exception:
-            try:
-                return response.choices[0]["message"]["content"]
-            except Exception:
-                return str(response)
+        content = (
+            response
+            .choices[0]
+            .message
+            .content
+        )
 
-    except Exception as e:
-        logger.exception("OpenAI request failed while generating research summary. API key present=%s", bool(OPENAI_API_KEY))
-        return "Unable to generate research summary."
+        if not content:
+            raise ValueError(
+                "OpenAI returned empty content."
+            )
+
+        content = (
+            content
+            .replace("```json", "")
+            .replace("```", "")
+            .strip()
+        )
+
+        return json.loads(content)
+
+    except json.JSONDecodeError:
+        logger.exception(
+            "Failed to parse OpenAI JSON response"
+        )
+
+        raise
+
+    except Exception:
+        logger.exception(
+            "OpenAI request failed"
+        )
+
+        raise

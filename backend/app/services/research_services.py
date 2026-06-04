@@ -42,20 +42,34 @@ def get_research_sessions(db: Session, user: User):
 
 def create_research(db: Session, user: User, request: CreateResearchRequest):
     try:
-        summary = generate_research_summary(request.topic)
+        research_data = (
+            generate_research_summary(
+                request.topic
+            )
+        )
+
     except Exception:
-        summary = "Unable to generate research summary."
+        research_data = {
+            "overview":
+                "Failed to generate research.",
+
+            "key_findings": [],
+
+            "risks": [],
+
+            "future_trends": []
+        }
 
     research = ResearchSession(
         user_id=user.id,
         topic=request.topic,
-        summary=summary
+        research_data=research_data
     )
-    
+
     db.add(research)
     db.commit()
     db.refresh(research)
-    
+
     return research
 
 def delete_research(db: Session, user: User, research_id: int):

@@ -1,7 +1,14 @@
+export interface ResearchData {
+    overview: string;
+    key_findings: string[];
+    risks: string[];
+    future_trends: string[];
+}
+
 export interface Research {
     id: number;
     topic: string;
-    summary: string;
+    research_data: ResearchData;
     created_at: string;
 }
 

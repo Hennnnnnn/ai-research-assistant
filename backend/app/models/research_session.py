@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
-
+from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -27,8 +27,9 @@ class ResearchSession(Base):
         String(255)
     )
 
-    summary: Mapped[str] = mapped_column(
-        String(5000)
+    research_data: Mapped[dict] = mapped_column(
+        JSON,
+        nullable=False
     )
 
     created_at: Mapped[datetime] = mapped_column(

@@ -1,89 +1,115 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
-import { getResearchDetail } from "../api/research";
+import { getResearchDetail } from '../api/research'
 
-import type { Research } from "../types/research";
-import { deleteResearch } from "../api/research";
+import type { Research } from '../types/research'
+import { deleteResearch } from '../api/research'
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom'
 
 export default function ResearchDetail() {
-    const { id } = useParams();
-    const navigate = useNavigate();
+    const { id } = useParams()
+    const navigate = useNavigate()
 
-    const [research, setResearch] = useState<Research | null>(null);
+    const [research, setResearch] = useState<Research | null>(null)
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true)
 
-    const [error, setError] = useState("");
+    const [error, setError] = useState('')
 
     async function handleDelete() {
-        if (!window.confirm(
-            "Delete this research?"
-        )) {
-            return;
+        if (!window.confirm('Delete this research?')) {
+            return
         }
 
-        await deleteResearch(research!.id);
+        await deleteResearch(research!.id)
 
-        navigate("/")
-    }
-
-    async function loadResearch() {
-        try {
-            setLoading(true);
-
-            const data = await getResearchDetail(Number(id));
-
-            setResearch(data);
-        } catch (err) {
-            setError("Failed to load research");
-
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+        navigate('/')
     }
 
     useEffect(() => {
-        if (id) {
-            loadResearch();
+        if (!id) {
+            return
         }
-    }, [id]);
+
+        async function fetchResearch() {
+            try {
+                setLoading(true)
+
+                const data = await getResearchDetail(Number(id))
+
+                setResearch(data)
+            } catch (err) {
+                setError('Failed to load research')
+
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchResearch()
+    }, [id])
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div>Loading...</div>
     }
 
     if (error) {
-        return <div>{error}</div>;
+        return <div>{error}</div>
     }
 
     if (!research) {
-        return <div>Research not found</div>;
+        return <div>Research not found</div>
     }
 
     return (
         <div>
-            <button
-                onClick={handleDelete}
-            >
-                Delete Research
-            </button>
-            
+            <button onClick={handleDelete}>Delete Research</button>
+
             <h1>{research.topic}</h1>
 
             <p>
-                <strong>Created At:</strong>{" "}
+                <strong>Created At:</strong>{' '}
                 {new Date(research.created_at).toLocaleString()}
             </p>
 
             <hr />
 
-            <h2>Summary</h2>
+            <h2>Overview</h2>
 
-            <p>{research.summary}</p>
+            <p>{research.research_data.overview}</p>
+
+            <hr />
+
+            <h2>Key Findings</h2>
+
+            <ul>
+                {research.research_data.key_findings.map((finding, index) => (
+                    <li key={index}>{finding}</li>
+                ))}
+            </ul>
+
+            <hr />
+
+            <h2>Risks</h2>
+
+            <ul>
+                {research.research_data.risks.map((risk, index) => (
+                    <li key={index}>{risk}</li>
+                ))}
+            </ul>
+
+            <hr />
+
+            <h2>Future Trends</h2>
+
+            <ul>
+                {research.research_data.future_trends.map((trend, index) => (
+                    <li key={index}>{trend}</li>
+                ))}
+            </ul>
         </div>
-    );
+    )
 }
