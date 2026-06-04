@@ -15,12 +15,24 @@ export async function createResearch(
     return response.data
 }
 
-export async function getResearchList() {
-    const response = await client.get(
-        "/research"
-    )
+export async function getResearchList(
+    search?: string,
+    page = 1,
+    pageSize = 10
+) {
+    const response =
+        await client.get(
+            "/research",
+            {
+                params: {
+                    search,
+                    page,
+                    page_size: pageSize
+                }
+            }
+        );
 
-    return response.data
+    return response.data;
 }
 
 export async function getResearchDetail(

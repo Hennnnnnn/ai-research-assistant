@@ -34,7 +34,9 @@ def get_research_by_id(
 def get_research_sessions(
     db: Session,
     user: User,
-    search: str | None = None
+    search: str | None = None,
+    page: int = 1,
+    page_size: int = 10
 ):
     statement = (
         select(ResearchSession)
@@ -50,14 +52,25 @@ def get_research_sessions(
                 f"%{search}%"
             )
         )
+        
+    total = len(db.scalars(statement).all())
+    offset = (page - 1) * page_size
 
-    statement = statement.order_by(
-        ResearchSession.created_at.desc()
-    )
-
-    return db.scalars(
+    items = db.scalars(
         statement
+        .order_by(
+            ResearchSession.created_at.desc()
+        )
+        .offset(offset)
+        .limit(page_size)
     ).all()
+
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size
+    }
 
 def create_research(db: Session, user: User, request: CreateResearchRequest):
     try:

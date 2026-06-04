@@ -5,7 +5,7 @@ from typing import Optional
 
 from app.models.user import User
 
-from app.schemas.research import CreateResearchRequest, ResearchResponse, ResearchListResponse
+from app.schemas.research import CreateResearchRequest, PaginatedResearchResponse, ResearchResponse, ResearchListResponse
 from app.services.research_services import create_research, get_research_sessions, get_research_by_id, delete_research
 from app.services.pdf_services import generate_research_pdf
 from app.database.dependencies import get_db
@@ -23,17 +23,25 @@ router = APIRouter(
 
 @router.get(
     "",
-    response_model=list[ResearchListResponse]
+    response_model=PaginatedResearchResponse
 )
 def get_research_list(
-    search: Optional[str] = None,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    search: str | None = None,
+    page: int = 1,
+    page_size: int = 10,
+    db: Session = Depends(
+        get_db
+    ),
+    current_user: User = Depends(
+        get_current_user
+    )
 ):
     return get_research_sessions(
         db,
         current_user,
-        search
+        search,
+        page,
+        page_size
     )
 
 @router.get(

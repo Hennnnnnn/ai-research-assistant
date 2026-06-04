@@ -17,3 +17,10 @@ export interface ResearchListItem {
     topic: string;
     created_at: string;
 }
+
+export interface PaginatedResearchResponse {
+    items: Research[];
+    total: number;
+    page: number;
+    page_size: number;
+}

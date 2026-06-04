@@ -10,17 +10,43 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
 
   const [topic, setTopic] = useState("");
+  const [page, setPage] = useState(1);
 
+  const [total, setTotal] = useState(0);
+
+  const pageSize = 10;
   const [researches, setResearches] = useState<ResearchListItem[]>([]);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer =
+      setTimeout(() => {
+        setDebouncedSearch(
+          search
+        );
+      }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
 
   async function loadResearches() {
-    const data = await getResearchList();
+    const data = await getResearchList(
+      debouncedSearch,
+      page,
+      pageSize
+    );
 
-    setResearches(data);
+    setResearches(data.items);
+    setTotal(data.total);
   }
 
   async function handleGenerate() {
-    if (!topic.trim()) return;
+    if (!topic.trim()) {
+      return;
+    }
 
     await createResearch({
       topic,
@@ -28,12 +54,12 @@ export default function Dashboard() {
 
     setTopic("");
 
-    await loadResearches();
+    setPage(1);
   }
 
   useEffect(() => {
-    loadResearches();
-  }, []);
+    void loadResearches();
+  }, [page, debouncedSearch]);
 
   return (
     <div>
@@ -59,6 +85,15 @@ export default function Dashboard() {
 
       <h2>Research History</h2>
 
+      <input
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value)
+          setPage(1)
+        }}
+        placeholder="Search research..."
+      />
+
       <ul>
         {researches.map((research) => (
           <li key={research.id}>
@@ -69,6 +104,36 @@ export default function Dashboard() {
             </Link>
           </li>))}
       </ul>
+      <div>
+        <button
+          disabled={page === 1}
+          onClick={() =>
+            setPage(
+              page - 1
+            )
+          }
+        >
+          Previous
+        </button>
+
+        <span>
+          Page {page}
+        </span>
+
+        <button
+          disabled={
+            page * pageSize >=
+            total
+          }
+          onClick={() =>
+            setPage(
+              page + 1
+            )
+          }
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

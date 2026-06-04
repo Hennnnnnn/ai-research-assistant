@@ -44,3 +44,11 @@ class ResearchResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+    
+class PaginatedResearchResponse(
+    BaseModel
+):
+    items: list[ResearchListResponse]
+    total: int
+    page: int
+    page_size: int
