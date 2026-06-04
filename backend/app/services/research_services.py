@@ -3,6 +3,7 @@ from sqlalchemy import select
 
 from app.models.research_session import ResearchSession
 from app.models.user import User
+from app.services.openai_service import generate_research_summary
 
 from app.schemas.research import CreateResearchRequest
 
@@ -40,10 +41,15 @@ def get_research_sessions(db: Session, user: User):
     return db.scalars(statement).all()
 
 def create_research(db: Session, user: User, request: CreateResearchRequest):
+    try:
+        summary = generate_research_summary(request.topic)
+    except Exception:
+        summary = "Unable to generate research summary."
+
     research = ResearchSession(
         user_id=user.id,
         topic=request.topic,
-        summary=f"Research result for {request.topic}"
+        summary=summary
     )
     
     db.add(research)
