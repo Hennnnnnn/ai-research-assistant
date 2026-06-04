@@ -43,3 +43,12 @@ export async function deleteResearch(
 
     return response.data;
 }
+
+export async function exportResearchPDF(id: number) {
+    return await client.get(
+        `/research/${id}/pdf`,
+        {
+            responseType: "blob"
+        }
+    );
+}

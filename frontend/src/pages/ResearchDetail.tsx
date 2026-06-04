@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { getResearchDetail } from '../api/research'
+import { exportResearchPDF, getResearchDetail } from '../api/research'
 
 import type { Research } from '../types/research'
 import { deleteResearch } from '../api/research'
@@ -52,6 +52,52 @@ export default function ResearchDetail() {
         fetchResearch()
     }, [id])
 
+    async function handleExport() {
+        if (!research) {
+            return;
+        }
+
+        try {
+            const response =
+                await exportResearchPDF(
+                    research.id
+                );
+
+            const url =
+                window.URL.createObjectURL(
+                    response.data
+                );
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+            link.href = url;
+
+            link.download =
+                `${research.topic}.pdf`;
+
+            document.body.appendChild(
+                link
+            );
+
+            link.click();
+
+            link.remove();
+
+            window.URL.revokeObjectURL(
+                url
+            );
+        } catch (err) {
+            console.error(err);
+
+            alert(
+                "Failed to export PDF"
+            );
+        }
+    }
+
     if (loading) {
         return <div>Loading...</div>
     }
@@ -66,8 +112,23 @@ export default function ResearchDetail() {
 
     return (
         <div>
-            <button onClick={handleDelete}>Delete Research</button>
+            <div>
+                <button
+                    onClick={
+                        handleExport
+                    }
+                >
+                    Export PDF
+                </button>
 
+                <button
+                    onClick={
+                        handleDelete
+                    }
+                >
+                    Delete Research
+                </button>
+            </div>
             <h1>{research.topic}</h1>
 
             <p>

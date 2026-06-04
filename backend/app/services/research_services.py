@@ -31,14 +31,33 @@ def get_research_by_id(
         
     return research
 
-def get_research_sessions(db: Session, user: User):
+def get_research_sessions(
+    db: Session,
+    user: User,
+    search: str | None = None
+):
     statement = (
         select(ResearchSession)
-        .where(ResearchSession.user_id == user.id)
-        .order_by(ResearchSession.created_at.desc())
+        .where(
+            ResearchSession.user_id
+            == user.id
+        )
     )
-    
-    return db.scalars(statement).all()
+
+    if search:
+        statement = statement.where(
+            ResearchSession.topic.ilike(
+                f"%{search}%"
+            )
+        )
+
+    statement = statement.order_by(
+        ResearchSession.created_at.desc()
+    )
+
+    return db.scalars(
+        statement
+    ).all()
 
 def create_research(db: Session, user: User, request: CreateResearchRequest):
     try:
