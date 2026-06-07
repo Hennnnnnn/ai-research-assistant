@@ -1,3 +1,4 @@
+from app.models.enums import ResearchStatus
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
@@ -73,36 +74,50 @@ def get_research_sessions(
         "page_size": page_size
     }
 
-def create_research(db: Session, user: User, request: CreateResearchRequest):
-    try:
-        result = research_graph.invoke(
-                {
-                    "topic":
-                        request.topic
-                }
-            )
-
-        research_data = result["final_report"]
-
-    except Exception:
-        research_data = {
-            "overview":
-                "Failed to generate research.",
-
-            "key_findings": [],
-
-            "risks": [],
-
-            "future_trends": []
-        }
-
+def create_research(
+    db: Session,
+    user: User,
+    request: CreateResearchRequest
+):
     research = ResearchSession(
         user_id=user.id,
         topic=request.topic,
-        research_data=research_data
+        status=ResearchStatus.PROCESSING.value,
+        research_data={}
     )
 
     db.add(research)
+    db.commit()
+    db.refresh(research)
+
+    try:
+        result = research_graph.invoke(
+            {
+                "topic": request.topic
+            }
+        )
+
+        research.research_data = (
+            result["final_report"]
+        )
+
+        research.status = (
+            ResearchStatus.COMPLETED.value
+        )
+
+    except Exception:
+        research.research_data = {
+            "overview":
+                "Failed to generate research.",
+            "key_findings": [],
+            "risks": [],
+            "future_trends": []
+        }
+
+        research.status = (
+            ResearchStatus.FAILED.value
+        )
+
     db.commit()
     db.refresh(research)
 

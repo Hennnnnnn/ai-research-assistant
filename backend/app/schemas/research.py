@@ -18,32 +18,27 @@ class ResearchListResponse(BaseModel):
     id: int
     topic: str
     created_at: datetime
-    
+    status: str
     model_config = {
         "from_attributes": True
     }
     
 class ResearchData(BaseModel):
     overview: str
-
     key_findings: list[str]
-
     risks: list[str]
-
     future_trends: list[str]
     
 class ResearchResponse(BaseModel):
     id: int
-
     topic: str
-
     research_data: ResearchData
-
     created_at: datetime
-
+    status: str
     model_config = {
         "from_attributes": True
     }
+    
     
 class PaginatedResearchResponse(
     BaseModel

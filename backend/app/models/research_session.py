@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from app.models.enums import ResearchStatus
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
@@ -39,4 +40,10 @@ class ResearchSession(Base):
 
     user = relationship(
         "User"
+    )
+    
+    status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default=ResearchStatus.PENDING.value
     )
