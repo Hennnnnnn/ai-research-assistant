@@ -28,25 +28,42 @@ export default function ResearchDetail() {
         navigate('/')
     }
 
+    async function fetchResearch() {
+        try {
+            setLoading(true)
+
+            const data = await getResearchDetail(Number(id))
+
+            setResearch(data)
+        } catch (err) {
+            setError('Failed to load research')
+
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        if (
+            research?.status !==
+            "processing"
+        ) {
+            return;
+        }
+
+        const interval =
+            setInterval(() => {
+                fetchResearch();
+            }, 3000);
+
+        return () =>
+            clearInterval(interval);
+    }, [research?.status]);
+
     useEffect(() => {
         if (!id) {
             return
-        }
-
-        async function fetchResearch() {
-            try {
-                setLoading(true)
-
-                const data = await getResearchDetail(Number(id))
-
-                setResearch(data)
-            } catch (err) {
-                setError('Failed to load research')
-
-                console.error(err)
-            } finally {
-                setLoading(false)
-            }
         }
 
         fetchResearch()
@@ -108,6 +125,16 @@ export default function ResearchDetail() {
 
     if (!research) {
         return <div>Research not found</div>
+    }
+
+    if (
+        research.status === "processing"
+    ) {
+        return (
+            <div>
+                Research is being generated...
+            </div>
+        );
     }
 
     return (

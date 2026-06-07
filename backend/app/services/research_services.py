@@ -1,4 +1,5 @@
 from app.models.enums import ResearchStatus
+from app.tasks.research_tasks import generate_research_task
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
@@ -80,67 +81,26 @@ def create_research(
     user: User,
     request: CreateResearchRequest
 ):
-    logger = logging.getLogger(__name__)
     research = ResearchSession(
         user_id=user.id,
         topic=request.topic,
         status=ResearchStatus.PROCESSING.value,
-        research_data={}
+        research_data={
+            "overview": "",
+            "key_findings": [],
+            "risks": [],
+            "future_trends": [],
+            "sources": []
+        }
     )
 
     db.add(research)
     db.commit()
     db.refresh(research)
 
-    try:
-        result = research_graph.invoke(
-            {
-                "topic": request.topic
-            }
-        )
-
-        research.research_data = result.get("final_report")
-        if not research.research_data:
-            raise ValueError(
-                "Graph returned empty report"
-            )
-        research.status = (
-            ResearchStatus.COMPLETED.value
-        )
-
-    except Exception as e:
-        logger.exception("research_graph.invoke failed: %s", e)
-
-        # try calling OpenAI directly as a best-effort fallback
-        try:
-            research.research_data = {
-                "overview":
-                    "Fallback failed",
-
-                "key_findings": [],
-
-                "risks": [],
-
-                "future_trends": [],
-
-                "sources": []
-            }
-
-            research.status = (
-                ResearchStatus.FAILED.value
-            )
-        except Exception:
-            logger.exception("Direct OpenAI fallback also failed")
-            research.research_data = {
-                "overview": "Failed to generate research.",
-                "key_findings": [],
-                "risks": [],
-                "future_trends": []
-            }
-            research.status = ResearchStatus.FAILED.value
-
-    db.commit()
-    db.refresh(research)
+    generate_research_task.delay(
+        research.id
+    )
 
     return research
 

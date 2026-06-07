@@ -16,6 +16,7 @@ export interface Research {
     id: number;
     topic: string;
     research_data: ResearchData;
+    status: string;
     created_at: string;
 }
 
