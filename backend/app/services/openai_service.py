@@ -15,32 +15,28 @@ client = OpenAI(
 def generate_research_summary(
     topic: str
 ) -> dict:
-    prompt = f"""
-        Create a research report about:
-
-        {topic}
-
-        Return ONLY valid JSON.
-
-        Do not wrap the JSON inside markdown code blocks.
-        Do not include explanations.
-        Do not include any text outside JSON.
-
-        Schema:
-
-        {{
-            "overview": "",
-            "key_findings": [],
-            "risks": [],
-            "future_trends": [],
-            "sources": [
-                {
-                    "title": "",
-                    "url": ""
-                }
-            ]
-        }}
-    """
+    # build prompt by concatenation to avoid f-string parsing of braces
+    prompt = (
+        "Create a research report about:\n\n"
+        + topic
+        + "\n\nReturn ONLY valid JSON.\n\n"
+        "Do not wrap the JSON inside markdown code blocks.\n"
+        "Do not include explanations.\n"
+        "Do not include any text outside JSON.\n\n"
+        "Schema:\n\n"
+        "{\n"
+        "  \"overview\": \"\",\n"
+        "  \"key_findings\": [],\n"
+        "  \"risks\": [],\n"
+        "  \"future_trends\": [],\n"
+        "  \"sources\": [\n"
+        "    {\n"
+        "      \"title\": \"\",\n"
+        "      \"url\": \"\"\n"
+        "    }\n"
+        "  ]\n"
+        "}"
+    )
 
     if not OPENAI_API_KEY:
         raise ValueError(

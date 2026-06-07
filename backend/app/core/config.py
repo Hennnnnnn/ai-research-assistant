@@ -19,3 +19,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
 OPENAI_API_KEY = os.getenv(
     "OPENAI_API_KEY"
 )
+
+TAVILY_API_KEY = os.getenv(
+    "TAVILY_API_KEY"
+)

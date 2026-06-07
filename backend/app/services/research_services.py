@@ -10,6 +10,7 @@ from app.agents.research_graph import research_graph
 from app.schemas.research import CreateResearchRequest
 
 from fastapi import HTTPException
+import logging
 
 def get_research_by_id(
     db: Session,
@@ -79,6 +80,7 @@ def create_research(
     user: User,
     request: CreateResearchRequest
 ):
+    logger = logging.getLogger(__name__)
     research = ResearchSession(
         user_id=user.id,
         topic=request.topic,
@@ -97,28 +99,34 @@ def create_research(
             }
         )
 
-        research.research_data = (
-            result["final_report"]
-        )
+        research.research_data = result.get("final_report")
+
+        # If the graph returned nothing useful, fall back to direct OpenAI call
+        if not research.research_data:
+            logger.warning("research_graph returned empty final_report, falling back to direct OpenAI call")
+            research.research_data = generate_research_summary(request.topic)
 
         research.status = (
             ResearchStatus.COMPLETED.value
         )
 
-    except Exception:
-        research.research_data = {
-            {
+    except Exception as e:
+        logger.exception("research_graph.invoke failed: %s", e)
+
+        # try calling OpenAI directly as a best-effort fallback
+        try:
+            research.research_data = generate_research_summary(request.topic)
+            research.status = ResearchStatus.COMPLETED.value
+        except Exception:
+            logger.exception("Direct OpenAI fallback also failed")
+            research.research_data = {
                 "overview": "Failed to generate research.",
                 "key_findings": [],
                 "risks": [],
                 "future_trends": [],
                 "sources": []
             }
-        }
-
-        research.status = (
-            ResearchStatus.FAILED.value
-        )
+            research.status = ResearchStatus.FAILED.value
 
     db.commit()
     db.refresh(research)
