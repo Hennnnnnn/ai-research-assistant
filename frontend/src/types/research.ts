@@ -23,8 +23,8 @@ export interface Research {
 export interface ResearchListItem {
     id: number;
     topic: string;
-    status: string;
     created_at: string;
+    status: string;
 }
 
 export interface PaginatedResearchResponse {

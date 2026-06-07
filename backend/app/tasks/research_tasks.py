@@ -8,6 +8,7 @@ from app.models.enums import ResearchStatus
 def generate_research_task(
     research_id: int
 ):
+    print(f"Start generate_research_task {research_id}")
     db = SessionLocal()
 
     try:
@@ -59,4 +60,7 @@ def generate_research_task(
         raise
 
     finally:
+        print(f"FINISH generate_research_task {research_id}")
+        
         db.close()
+    

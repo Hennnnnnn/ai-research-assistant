@@ -132,7 +132,29 @@ export default function ResearchDetail() {
     ) {
         return (
             <div>
-                Research is being generated...
+                <h1>
+                    {research.topic}
+                </h1>
+
+                <p>
+                    🟡 Research is being generated...
+                </p>
+            </div>
+        );
+    }
+
+    if (
+        research.status === "failed"
+    ) {
+        return (
+            <div>
+                <h1>
+                    {research.topic}
+                </h1>
+
+                <p>
+                    🔴 Research generation failed
+                </p>
             </div>
         );
     }

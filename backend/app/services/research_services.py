@@ -98,9 +98,13 @@ def create_research(
     db.commit()
     db.refresh(research)
 
-    generate_research_task.delay(
+    task = generate_research_task.delay(
         research.id
     )
+    
+    print(f"Queued research {research.id}")
+    
+    print(f"Task id: {task.id}")
 
     return research
 

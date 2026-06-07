@@ -58,6 +58,16 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
+    const interval =
+      setInterval(() => {
+        void loadResearches();
+      }, 5000);
+
+    return () =>
+      clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     void loadResearches();
   }, [page, debouncedSearch]);
 
@@ -102,8 +112,22 @@ export default function Dashboard() {
             >
               {research.topic}
             </Link>
-            <span>{research.status}</span>
-          </li>))}
+
+            {" "}
+
+            {research.status === "completed" && (
+              <span>🟢 Completed</span>
+            )}
+
+            {research.status === "processing" && (
+              <span>🟡 Processing</span>
+            )}
+
+            {research.status === "failed" && (
+              <span>🔴 Failed</span>
+            )}
+          </li>
+        ))}
       </ul>
       <div>
         <button

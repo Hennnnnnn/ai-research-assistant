@@ -1,5 +1,55 @@
+version: "3.9"
+
 services:
+  postgres:
+    image: postgres:16
+    container_name: research_postgres
+    environment:
+      POSTGRES_DB: research_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: hendri123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis:7
+    container_name: research_redis
     ports:
       - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: research_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./backend/.env
+
+  celery:
+    build:
+      context: ./backend
+    container_name: research_celery
+    command: celery -A app.core.celery_app:celery_app worker --pool=solo --loglevel=info
+    depends_on:
+      - backend
+      - redis
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: research_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
