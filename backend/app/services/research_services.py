@@ -100,12 +100,10 @@ def create_research(
         )
 
         research.research_data = result.get("final_report")
-
-        # If the graph returned nothing useful, fall back to direct OpenAI call
         if not research.research_data:
-            logger.warning("research_graph returned empty final_report, falling back to direct OpenAI call")
-            research.research_data = generate_research_summary(request.topic)
-
+            raise ValueError(
+                "Graph returned empty report"
+            )
         research.status = (
             ResearchStatus.COMPLETED.value
         )
@@ -115,16 +113,29 @@ def create_research(
 
         # try calling OpenAI directly as a best-effort fallback
         try:
-            research.research_data = generate_research_summary(request.topic)
-            research.status = ResearchStatus.COMPLETED.value
+            research.research_data = {
+                "overview":
+                    "Fallback failed",
+
+                "key_findings": [],
+
+                "risks": [],
+
+                "future_trends": [],
+
+                "sources": []
+            }
+
+            research.status = (
+                ResearchStatus.FAILED.value
+            )
         except Exception:
             logger.exception("Direct OpenAI fallback also failed")
             research.research_data = {
                 "overview": "Failed to generate research.",
                 "key_findings": [],
                 "risks": [],
-                "future_trends": [],
-                "sources": []
+                "future_trends": []
             }
             research.status = ResearchStatus.FAILED.value
 

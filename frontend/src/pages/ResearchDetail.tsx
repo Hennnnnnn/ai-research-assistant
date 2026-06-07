@@ -147,9 +147,17 @@ export default function ResearchDetail() {
             <h2>Key Findings</h2>
 
             <ul>
-                {research.research_data.key_findings.map((finding, index) => (
-                    <li key={index}>{finding}</li>
-                ))}
+                {research.research_data.key_findings.map(
+                    (finding, index) => (
+                        <li key={index}>
+                            {finding.statement}
+
+                            {" "}
+
+                            [{finding.source_id}]
+                        </li>
+                    )
+                )}
             </ul>
 
             <hr />
@@ -157,9 +165,17 @@ export default function ResearchDetail() {
             <h2>Risks</h2>
 
             <ul>
-                {research.research_data.risks.map((risk, index) => (
-                    <li key={index}>{risk}</li>
-                ))}
+                {research.research_data.risks.map(
+                    (risk, index) => (
+                        <li key={index}>
+                            {risk.statement}
+
+                            {" "}
+
+                            [{risk.source_id}]
+                        </li>
+                    )
+                )}
             </ul>
 
             <hr />
@@ -167,17 +183,27 @@ export default function ResearchDetail() {
             <h2>Future Trends</h2>
 
             <ul>
-                {research.research_data.future_trends.map((trend, index) => (
-                    <li key={index}>{trend}</li>
-                ))}
+                {research.research_data.future_trends.map(
+                    (trend, index) => (
+                        <li key={index}>
+                            {trend.statement}
+
+                            {" "}
+
+                            [{trend.source_id}]
+                        </li>
+                    )
+                )}
             </ul>
 
-            <h2>Sources</h2>
+            <h2>References</h2>
 
             <ul>
                 {(research.research_data.sources ?? []).map(
-                    (source, index) => (
-                        <li key={index}>
+                    (source) => (
+                        <li key={source.id}>
+                            [{source.id}]{" "}
+
                             <a
                                 href={source.url}
                                 target="_blank"

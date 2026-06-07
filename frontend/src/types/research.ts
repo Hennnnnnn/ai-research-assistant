@@ -1,12 +1,13 @@
 export interface ResearchData {
     overview: string;
-    key_findings: string[];
-    risks: string[];
-    future_trends: string[];
-    sources: Source[];
+    key_findings: CitationItem[];
+    risks: CitationItem[];
+    future_trends: CitationItem[];
+    sources: SourceItem[];
 }
 
-export interface Source {
+export interface SourceItem {
+    id: number;
     title: string;
     url: string;
 }
@@ -30,4 +31,9 @@ export interface PaginatedResearchResponse {
     total: number;
     page: number;
     page_size: number;
+}
+
+export interface CitationItem {
+    statement: string;
+    source_id: number;
 }

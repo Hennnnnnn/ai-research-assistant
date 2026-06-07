@@ -13,30 +13,57 @@ client = OpenAI(
 
 
 def generate_research_summary(
-    topic: str
+    topic: str,
+    sources: list
 ) -> dict:
     # build prompt by concatenation to avoid f-string parsing of braces
-    prompt = (
-        "Create a research report about:\n\n"
-        + topic
-        + "\n\nReturn ONLY valid JSON.\n\n"
-        "Do not wrap the JSON inside markdown code blocks.\n"
-        "Do not include explanations.\n"
-        "Do not include any text outside JSON.\n\n"
-        "Schema:\n\n"
-        "{\n"
-        "  \"overview\": \"\",\n"
-        "  \"key_findings\": [],\n"
-        "  \"risks\": [],\n"
-        "  \"future_trends\": [],\n"
-        "  \"sources\": [\n"
-        "    {\n"
-        "      \"title\": \"\",\n"
-        "      \"url\": \"\"\n"
-        "    }\n"
-        "  ]\n"
-        "}"
-    )
+    prompt = f"""
+        Create a research report about:
+
+        {topic}
+
+        Use ONLY the provided sources.
+
+        Sources:
+
+        {json.dumps(sources, indent=2)}
+
+        For every key finding, risk, and future trend:
+
+        - include a source_id
+        - source_id must reference one of the provided sources
+        - do not invent source ids
+        - do not invent sources
+
+        Return ONLY valid JSON.
+
+        Schema:
+
+        {{
+        "overview": "",
+
+        "key_findings": [
+            {{
+            "statement": "",
+            "source_id": 1
+            }}
+        ],
+
+        "risks": [
+            {{
+            "statement": "",
+            "source_id": 1
+            }}
+        ],
+
+        "future_trends": [
+            {{
+            "statement": "",
+            "source_id": 1
+            }}
+        ]
+        }}
+    """   
 
     if not OPENAI_API_KEY:
         raise ValueError(

@@ -23,11 +23,24 @@ class ResearchListResponse(BaseModel):
         "from_attributes": True
     }
     
+
+class CitationItem(BaseModel):
+    statement: str
+    source_id: int
+
+
+class SourceItem(BaseModel):
+    id: int
+    title: str
+    url: str
+
+
 class ResearchData(BaseModel):
     overview: str
-    key_findings: list[str]
-    risks: list[str]
-    future_trends: list[str]
+    key_findings: list[CitationItem]
+    risks: list[CitationItem]
+    future_trends: list[CitationItem]
+    sources: list[SourceItem]
     
 class ResearchResponse(BaseModel):
     id: int

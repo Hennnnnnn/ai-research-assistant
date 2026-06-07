@@ -21,10 +21,16 @@ def search_agent(
         max_results=5
     )
 
-    state["search_results"] = (
-        response["results"]
-    )
-    
-    print(response)
+    state["search_results"] = response["results"]
+
+    state["sources"] = [
+        {
+            "id": index + 1,
+            "title": item["title"],
+            "url": item["url"]
+        }
+        for index, item
+        in enumerate(response["results"])
+    ]
 
     return state
