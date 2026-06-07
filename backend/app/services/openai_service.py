@@ -32,7 +32,13 @@ def generate_research_summary(
             "overview": "",
             "key_findings": [],
             "risks": [],
-            "future_trends": []
+            "future_trends": [],
+            "sources": [
+                {
+                    "title": "",
+                    "url": ""
+                }
+            ]
         }}
     """
 

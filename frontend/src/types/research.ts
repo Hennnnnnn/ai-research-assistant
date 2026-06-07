@@ -3,6 +3,12 @@ export interface ResearchData {
     key_findings: string[];
     risks: string[];
     future_trends: string[];
+    sources: Source[];
+}
+
+export interface Source {
+    title: string;
+    url: string;
 }
 
 export interface Research {
@@ -15,6 +21,7 @@ export interface Research {
 export interface ResearchListItem {
     id: number;
     topic: string;
+    status: string;
     created_at: string;
 }
 

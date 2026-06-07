@@ -107,11 +107,13 @@ def create_research(
 
     except Exception:
         research.research_data = {
-            "overview":
-                "Failed to generate research.",
-            "key_findings": [],
-            "risks": [],
-            "future_trends": []
+            {
+                "overview": "Failed to generate research.",
+                "key_findings": [],
+                "risks": [],
+                "future_trends": [],
+                "sources": []
+            }
         }
 
         research.status = (

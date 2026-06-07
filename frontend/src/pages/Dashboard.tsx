@@ -102,6 +102,7 @@ export default function Dashboard() {
             >
               {research.topic}
             </Link>
+            <span>{research.status}</span>
           </li>))}
       </ul>
       <div>

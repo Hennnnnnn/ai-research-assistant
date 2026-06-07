@@ -171,6 +171,24 @@ export default function ResearchDetail() {
                     <li key={index}>{trend}</li>
                 ))}
             </ul>
+
+            <h2>Sources</h2>
+
+            <ul>
+                {(research.research_data.sources ?? []).map(
+                    (source, index) => (
+                        <li key={index}>
+                            <a
+                                href={source.url}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {source.title}
+                            </a>
+                        </li>
+                    )
+                )}
+            </ul>
         </div>
     )
 }
