@@ -4,6 +4,7 @@ from sqlalchemy import select
 from app.models.research_session import ResearchSession
 from app.models.user import User
 from app.services.openai_service import generate_research_summary
+from app.agents.research_graph import research_graph
 
 from app.schemas.research import CreateResearchRequest
 
@@ -74,11 +75,14 @@ def get_research_sessions(
 
 def create_research(db: Session, user: User, request: CreateResearchRequest):
     try:
-        research_data = (
-            generate_research_summary(
-                request.topic
+        result = research_graph.invoke(
+                {
+                    "topic":
+                        request.topic
+                }
             )
-        )
+
+        research_data = result["final_report"]
 
     except Exception:
         research_data = {
