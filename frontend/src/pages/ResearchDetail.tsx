@@ -62,28 +62,6 @@ export default function ResearchDetail() {
     }, [research?.status]);
 
     useEffect(() => {
-        if (
-            !research ||
-            research.status !== "processing"
-        ) {
-            return;
-        }
-
-        const interval =
-            setInterval(async () => {
-                const data =
-                    await getResearchDetail(
-                        research.id
-                    );
-
-                setResearch(data);
-            }, 3000);
-
-        return () =>
-            clearInterval(interval);
-    }, [research]);
-
-    useEffect(() => {
         if (!id) {
             return
         }
@@ -160,6 +138,12 @@ export default function ResearchDetail() {
 
                 <p>
                     🟡 Research is being generated...
+                </p>
+
+                <p>
+                    Progress:
+                    {" "}
+                    {research.progress_message}
                 </p>
             </div>
         );
