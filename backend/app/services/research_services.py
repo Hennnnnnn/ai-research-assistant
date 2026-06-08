@@ -85,6 +85,7 @@ def create_research(
         user_id=user.id,
         topic=request.topic,
         status=ResearchStatus.PROCESSING.value,
+        progress_message="Queued",
         research_data={
             "overview": "",
             "key_findings": [],

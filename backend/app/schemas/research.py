@@ -48,6 +48,7 @@ class ResearchResponse(BaseModel):
     research_data: ResearchData
     created_at: datetime
     status: str
+    progress_message: str
     model_config = {
         "from_attributes": True
     }

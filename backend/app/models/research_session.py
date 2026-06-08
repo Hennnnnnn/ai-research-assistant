@@ -47,3 +47,9 @@ class ResearchSession(Base):
         nullable=False,
         default=ResearchStatus.PENDING.value
     )
+    
+    progress_message: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        default="Queued"
+    )

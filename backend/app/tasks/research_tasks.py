@@ -20,6 +20,12 @@ def generate_research_task(
         if not research:
             return
 
+        update_progress(
+            db,
+            research,
+            "Searching sources..."
+        )
+        
         result = research_graph.invoke(
             {
                 "topic": research.topic
@@ -28,6 +34,10 @@ def generate_research_task(
 
         research.research_data = (
             result["final_report"]
+        )
+        
+        research.progress_message = (
+            "Completed"
         )
 
         research.status = (
@@ -38,6 +48,10 @@ def generate_research_task(
 
     except Exception:
         if research:
+            research.progress_message = (
+                "Failed"
+            )
+            
             research.status = (
                 ResearchStatus.FAILED.value
             )
@@ -64,3 +78,13 @@ def generate_research_task(
         
         db.close()
     
+def update_progress(
+    db,
+    research,
+    message: str
+):
+    research.progress_message = message
+    
+    db.commit()
+    
+    db.refresh(research)

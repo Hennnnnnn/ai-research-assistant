@@ -126,6 +126,10 @@ export default function Dashboard() {
             {research.status === "failed" && (
               <span>🔴 Failed</span>
             )}
+
+            <div>
+              {research.progress_message}
+            </div>
           </li>
         ))}
       </ul>

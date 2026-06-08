@@ -17,6 +17,7 @@ export interface Research {
     topic: string;
     research_data: ResearchData;
     status: string;
+    progress_message: string;
     created_at: string;
 }
 
@@ -24,6 +25,7 @@ export interface ResearchListItem {
     id: number;
     topic: string;
     created_at: string;
+    progress_message: string;
     status: string;
 }
 
